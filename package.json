@@ -23,7 +23,8 @@
     "deploy": "turbo -F @chatbot-app/infra deploy",
     "destroy": "turbo -F @chatbot-app/infra destroy",
     "check": "ultracite check",
-    "fix": "ultracite fix"
+    "fix": "ultracite fix",
+    "test:chatbot": "bun test-integration.ts"
   },
   "dependencies": {
     "@chatbot-app/env": "workspace:*",
