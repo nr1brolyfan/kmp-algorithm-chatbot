@@ -4,6 +4,7 @@
  */
 
 import { processMessage, WELCOME_MESSAGE } from "../lib/chatbot";
+import { createEmptyContext } from "../lib/chatbot/conversation-context";
 
 // Symulacja działania hooka (bez React)
 interface Message {
@@ -50,11 +51,14 @@ const userMessage: Message = {
 messages.push(userMessage);
 console.log("Użytkownik:", userMessage.text);
 
-// Odpowiedź bota
-const botResponseText = processMessage(userText);
+// Odpowiedź bota (z kontekstem)
+let context = createEmptyContext();
+const result = processMessage(userText, context);
+context = result.updatedContext;
+
 const botMessage: Message = {
 	id: generateId(),
-	text: botResponseText,
+	text: result.response,
 	sender: "bot",
 	timestamp: new Date(),
 };
