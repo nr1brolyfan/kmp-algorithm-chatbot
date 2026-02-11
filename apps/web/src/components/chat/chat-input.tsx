@@ -1,5 +1,5 @@
 import { Loader2, SendHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -9,9 +9,33 @@ interface ChatInputProps {
 	disabled?: boolean;
 }
 
+// Przykładowe pytania do rotacji w placeholderze
+const EXAMPLE_QUESTIONS = [
+	"Gdzie jest moje zamówienie?",
+	"Ile kosztuje dostawa?",
+	"Jak zwrócić produkt?",
+	"Jakie metody płatności akceptujecie?",
+	"Jak wybrać rozmiar?",
+	"Jak długo trwa dostawa?",
+	"Chcę anulować zamówienie",
+	"Czy mogę płacić ratami?",
+	"Czy produkt jest dostępny?",
+	"Chcę złożyć reklamację",
+];
+
 // Komponent pola wpisywania wiadomości
 export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
 	const [inputValue, setInputValue] = useState("");
+	const [placeholderIndex, setPlaceholderIndex] = useState(0);
+
+	// Rotacja placeholdera co 3 sekundy
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setPlaceholderIndex((prev) => (prev + 1) % EXAMPLE_QUESTIONS.length);
+		}, 3000);
+
+		return () => clearInterval(interval);
+	}, []);
 
 	// Obsługa wysyłania wiadomości
 	const handleSend = () => {
@@ -53,7 +77,9 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
 						onChange={(e) => setInputValue(e.target.value)}
 						onKeyDown={handleKeyDown}
 						placeholder={
-							disabled ? "Czekam na odpowiedź..." : "Napisz wiadomość..."
+							disabled
+								? "Czekam na odpowiedź..."
+								: EXAMPLE_QUESTIONS[placeholderIndex]
 						}
 						value={inputValue}
 					/>
