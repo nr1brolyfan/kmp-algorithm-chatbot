@@ -37,14 +37,14 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
 	const canSend = !disabled && inputValue.trim().length > 0;
 
 	return (
-		<div className="border-border/50 border-t bg-gradient-to-b from-white to-gray-50 p-4">
+		<div className="bg-gradient-to-b from-white to-gray-50 p-4">
 			<div className="flex gap-2">
 				{/* Input z lepszym stylingiem */}
 				<div className="relative flex-1">
 					<Input
 						aria-label="Pole tekstowe wiadomości"
 						className={cn(
-							"h-11 rounded-xl border-2 bg-white pr-4 pl-4 shadow-sm transition-all duration-200",
+							"h-11 rounded-xl border-2 bg-white pr-4 pl-4 text-gray-900 shadow-sm transition-all duration-200",
 							"placeholder:text-gray-400",
 							"focus-visible:border-blue-500 focus-visible:shadow-blue-100 focus-visible:shadow-md",
 							disabled && "cursor-not-allowed opacity-50"

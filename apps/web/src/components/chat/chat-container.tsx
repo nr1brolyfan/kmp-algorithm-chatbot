@@ -9,9 +9,9 @@ export function ChatContainer() {
 	const { messages, isTyping, sendMessage } = useChat();
 
 	return (
-		<Card className="mx-auto flex h-[90vh] max-h-[800px] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border-border/50 shadow-2xl backdrop-blur-sm transition-all duration-300 hover:shadow-3xl sm:h-[600px]">
+		<Card className="mx-auto flex h-[90vh] max-h-[800px] w-full max-w-4xl flex-col gap-0 overflow-hidden rounded-2xl border-0 bg-transparent p-0 shadow-2xl ring-0 backdrop-blur-sm transition-all duration-300 hover:shadow-3xl sm:h-[600px]">
 			{/* Nagłówek czatu - nowoczesny gradient */}
-			<CardHeader className="relative overflow-hidden border-border/20 border-b bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 px-4 py-4 text-white sm:px-6">
+			<CardHeader className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 px-4 py-4 text-white sm:px-6">
 				{/* Dekoracyjne tło */}
 				<div className="absolute inset-0 bg-grid-white/10" />
 				<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
