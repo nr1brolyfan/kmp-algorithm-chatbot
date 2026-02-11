@@ -27,17 +27,22 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
 	});
 
 	return (
-		<div className="flex-1 space-y-2 overflow-y-auto bg-gray-50 p-4">
+		<div className="relative flex-1 overflow-y-auto bg-gradient-to-b from-gray-50 to-white p-4 sm:p-6">
+			{/* Dekoracyjny pattern w tle */}
+			<div className="pointer-events-none absolute inset-0 bg-grid-gray-100/50 opacity-30" />
+
 			{/* Lista wiadomości */}
-			{messages.map((message) => (
-				<ChatMessage key={message.id} message={message} />
-			))}
+			<div className="relative space-y-2">
+				{messages.map((message) => (
+					<ChatMessage key={message.id} message={message} />
+				))}
 
-			{/* Wskaźnik "bot pisze..." */}
-			{isTyping && <TypingIndicator />}
+				{/* Wskaźnik "bot pisze..." */}
+				{isTyping && <TypingIndicator />}
 
-			{/* Invisible element do auto-scroll */}
-			<div ref={messagesEndRef} />
+				{/* Invisible element do auto-scroll */}
+				<div ref={messagesEndRef} />
+			</div>
 		</div>
 	);
 }

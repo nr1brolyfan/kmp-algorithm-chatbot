@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bot, Sparkles } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useChat } from "@/hooks/use-chat";
 import { ChatInput } from "./chat-input";
 import { ChatMessages } from "./chat-messages";
@@ -8,15 +9,37 @@ export function ChatContainer() {
 	const { messages, isTyping, sendMessage } = useChat();
 
 	return (
-		<Card className="mx-auto flex h-[600px] w-full max-w-3xl flex-col shadow-lg">
-			{/* Nagłówek czatu */}
-			<CardHeader className="border-b bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-				<CardTitle className="font-semibold text-xl">
-					Asystent Sklepu Internetowego
-				</CardTitle>
-				<p className="mt-1 text-blue-100 text-sm">
-					Pomoc w zakupach, zamówieniach i dostawach
-				</p>
+		<Card className="mx-auto flex h-[90vh] max-h-[800px] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border-border/50 shadow-2xl backdrop-blur-sm transition-all duration-300 hover:shadow-3xl sm:h-[600px]">
+			{/* Nagłówek czatu - nowoczesny gradient */}
+			<CardHeader className="relative overflow-hidden border-border/20 border-b bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 px-4 py-4 text-white sm:px-6">
+				{/* Dekoracyjne tło */}
+				<div className="absolute inset-0 bg-grid-white/10" />
+				<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+
+				{/* Zawartość nagłówka */}
+				<div className="relative flex items-center gap-3">
+					{/* Ikona bota z animacją */}
+					<div className="flex size-12 items-center justify-center rounded-full bg-white/20 shadow-lg ring-2 ring-white/30 backdrop-blur-md transition-transform hover:scale-110">
+						<Bot className="size-6 text-white" />
+					</div>
+
+					{/* Tytuł i opis */}
+					<div className="flex-1">
+						<div className="flex items-center gap-2">
+							<h2 className="font-bold text-lg sm:text-xl">Asystent Sklepu</h2>
+							<Sparkles className="size-4 animate-pulse text-yellow-300" />
+						</div>
+						<p className="mt-0.5 text-blue-100 text-xs sm:text-sm">
+							Pomoc 24/7 • Zamówienia • Dostawa • Zwroty
+						</p>
+					</div>
+
+					{/* Status badge */}
+					<div className="hidden items-center gap-1.5 rounded-full bg-green-500/20 px-3 py-1 ring-1 ring-green-400/30 backdrop-blur-sm sm:flex">
+						<span className="size-2 animate-pulse rounded-full bg-green-400 shadow-green-400/50 shadow-lg" />
+						<span className="font-medium text-green-100 text-xs">Online</span>
+					</div>
+				</div>
 			</CardHeader>
 
 			{/* Treść karty - lista wiadomości */}
