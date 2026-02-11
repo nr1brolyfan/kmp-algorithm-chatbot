@@ -1,5 +1,5 @@
 import { Loader2, SendHorizontal } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ const EXAMPLE_QUESTIONS = [
 export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
 	const [inputValue, setInputValue] = useState("");
 	const [placeholderIndex, setPlaceholderIndex] = useState(0);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	// Rotacja placeholdera co 3 sekundy
 	useEffect(() => {
@@ -48,6 +49,11 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
 
 		onSendMessage(trimmedValue);
 		setInputValue(""); // Wyczyść pole po wysłaniu
+
+		// Przywróć focus na input po wysłaniu
+		setTimeout(() => {
+			inputRef.current?.focus();
+		}, 0);
 	};
 
 	// Obsługa klawisza Enter
@@ -81,6 +87,7 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
 								? "Czekam na odpowiedź..."
 								: EXAMPLE_QUESTIONS[placeholderIndex]
 						}
+						ref={inputRef}
 						value={inputValue}
 					/>
 
