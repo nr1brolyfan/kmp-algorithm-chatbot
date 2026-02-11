@@ -38,6 +38,13 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
 		return () => clearInterval(interval);
 	}, []);
 
+	// Przywróć focus na input gdy przestaje być disabled
+	useEffect(() => {
+		if (!disabled && inputRef.current) {
+			inputRef.current.focus();
+		}
+	}, [disabled]);
+
 	// Obsługa wysyłania wiadomości
 	const handleSend = () => {
 		const trimmedValue = inputValue.trim();
@@ -49,11 +56,6 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
 
 		onSendMessage(trimmedValue);
 		setInputValue(""); // Wyczyść pole po wysłaniu
-
-		// Przywróć focus na input po wysłaniu
-		setTimeout(() => {
-			inputRef.current?.focus();
-		}, 0);
 	};
 
 	// Obsługa klawisza Enter
