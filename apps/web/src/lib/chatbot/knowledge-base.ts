@@ -67,11 +67,16 @@ export const PATTERNS: Pattern[] = [
 			"sprawdzic",
 		],
 		responses: [
-			"Status zamówienia możesz sprawdzić w zakładce 'Moje zamówienia' po zalogowaniu. Potrzebujesz numeru zamówienia?",
-			"Aby sprawdzić status zamówienia, zaloguj się i przejdź do sekcji 'Moje zamówienia'. Tam znajdziesz aktualne informacje o przesyłce.",
+			"Status zamówienia możesz sprawdzić w zakładce 'Moje zamówienia' po zalogowaniu. Czy masz numer zamówienia?",
 		],
 		priority: 2,
 		category: "orders",
+		followUp: {
+			question:
+				"Podaj proszę numer zamówienia (format: 12345), a sprawdzę jego status dla Ciebie.",
+			expectedKeywords: ["numer", "nr", "zamowienie", "nie", "tak"],
+			context: "order-number",
+		},
 	},
 
 	// === ZAMÓWIENIA - Składanie ===
@@ -105,11 +110,16 @@ export const PATTERNS: Pattern[] = [
 			"wycofac",
 		],
 		responses: [
-			"Zamówienie można anulować do momentu wysyłki. Skontaktuj się z nami przez formularz lub zadzwoń na infolinię.",
-			"Jeśli zamówienie nie zostało jeszcze wysłane, możemy je anulować. Napisz do nas lub zadzwoń na infolinię jak najszybciej.",
+			"Zamówienie można anulować do momentu wysyłki. Czy mogę prosić o numer zamówienia, które chcesz anulować?",
 		],
 		priority: 2,
 		category: "orders",
+		followUp: {
+			question:
+				"Podaj numer zamówienia do anulowania. Sprawdzę, czy możemy je jeszcze wycofać.",
+			expectedKeywords: ["numer", "nr", "nie", "rezygnuje"],
+			context: "cancel-order-number",
+		},
 	},
 
 	// === DOSTAWA - Koszt ===
@@ -123,11 +133,16 @@ export const PATTERNS: Pattern[] = [
 			"platnosc za dostawe",
 		],
 		responses: [
-			"Koszt dostawy: kurier 15 zł, paczkomat 12 zł, darmowa dostawa od 200 zł.",
-			"Oferujemy dostawę kurierem za 15 zł, do paczkomatu za 12 zł. Przy zamówieniach powyżej 200 zł dostawa jest darmowa!",
+			"Koszt dostawy: kurier 15 zł, paczkomat 12 zł, darmowa dostawa od 200 zł. Którą opcję Cię interesuje?",
 		],
 		priority: 2,
 		category: "delivery",
+		followUp: {
+			question:
+				"Chcesz dowiedzieć się więcej o dostawie kurierskiej czy paczkomatami?",
+			expectedKeywords: ["kurier", "paczkomat", "inpost", "darmowa", "nie"],
+			context: "delivery-method-interest",
+		},
 	},
 
 	// === DOSTAWA - Czas ===
@@ -192,11 +207,23 @@ export const PATTERNS: Pattern[] = [
 			"niezgodny",
 		],
 		responses: [
-			"Aby złożyć reklamację, wypełnij formularz reklamacyjny i dołącz zdjęcia produktu. Rozpatrzymy ją w ciągu 14 dni.",
-			"Reklamację można zgłosić przez formularz online. Pamiętaj o dołączeniu zdjęć oraz opisu problemu. Odpowiemy w ciągu 14 dni.",
+			"Przykro mi słyszeć o problemie z produktem. Aby złożyć reklamację, potrzebuję kilku informacji. Jaki jest problem z produktem?",
 		],
 		priority: 2,
 		category: "returns",
+		followUp: {
+			question:
+				"Opisz proszę co jest nie tak z produktem - to pomoże nam szybciej rozpatrzyć reklamację.",
+			expectedKeywords: [
+				"uszkodzony",
+				"zepsuty",
+				"dziala",
+				"nie",
+				"zle",
+				"reklamuje",
+			],
+			context: "complaint-details",
+		},
 	},
 
 	// === PŁATNOŚCI - Metody ===
@@ -279,11 +306,26 @@ export const PATTERNS: Pattern[] = [
 			"wymiary",
 		],
 		responses: [
-			"Tabelę rozmiarów znajdziesz na stronie każdego produktu. Jeśli masz wątpliwości, napisz - pomożemy!",
-			"Każdy produkt ma szczegółową tabelę rozmiarów. W razie pytań chętnie doradzimy odpowiedni rozmiar.",
+			"Chętnie pomogę dobrać rozmiar! Jaki produkt Cię interesuje i jaki zwykle nosisz rozmiar?",
 		],
 		priority: 1,
 		category: "products",
+		followUp: {
+			question:
+				"Powiedz mi jaki produkt Cię interesuje, a pomogę wybrać odpowiedni rozmiar.",
+			expectedKeywords: [
+				"buty",
+				"ubranie",
+				"spodnie",
+				"koszulka",
+				"rozmiar",
+				"m",
+				"l",
+				"xl",
+				"nie",
+			],
+			context: "size-help",
+		},
 	},
 
 	// === OGÓLNE - Kontakt ===
@@ -316,4 +358,45 @@ export const PATTERNS: Pattern[] = [
 		priority: 1,
 		category: "general",
 	},
+];
+
+// === WZORCE ODPOWIEDZI NA FOLLOW-UP ===
+
+// Odpowiedzi na podanie numeru zamówienia
+export const ORDER_NUMBER_RESPONSES = [
+	"Sprawdzam zamówienie {number}... Status: W trakcie realizacji. Paczka zostanie wysłana w ciągu 24h!",
+	"Znalazłem zamówienie {number}! Obecnie jest pakowane i wkrótce zostanie wysłane kurierem.",
+	"Zamówienie {number} jest już w drodze! Możesz śledzić paczkę pod numerem śledzenia, który dostałeś mailem.",
+];
+
+// Odpowiedzi na podanie szczegółów reklamacji
+export const COMPLAINT_DETAILS_RESPONSES = [
+	"Rozumiem problem. Dziękuję za opis. Wypełnij proszę formularz reklamacyjny w panelu klienta i dołącz zdjęcia. Odpowiemy w ciągu 14 dni.",
+	"Przykro mi z tego powodu. Na podstawie opisu przygotuję dla Ciebie formularz reklamacyjny. Pamiętaj o dołączeniu zdjęć produktu.",
+];
+
+// Odpowiedzi na pytanie o metodę dostawy
+export const DELIVERY_METHOD_RESPONSES: Record<string, string[]> = {
+	kurier: [
+		"Dostawa kurierem kosztuje 15 zł i trwa 2-3 dni robocze. Możesz wybrać ekspres (24h) za 25 zł. Chcesz więcej szczegółów?",
+	],
+	paczkomat: [
+		"Paczkomaty InPost to 12 zł, dostawa w ciągu 2-3 dni. Możesz odebrać przesyłkę 24/7 w dowolnym momencie. Wygodne!",
+	],
+	darmowa: [
+		"Przy zamówieniach od 200 zł dostawa jest całkowicie darmowa, niezależnie od metody! Dodaj coś jeszcze do koszyka? 😊",
+	],
+};
+
+// Odpowiedzi na pomoc z rozmiarem
+export const SIZE_HELP_RESPONSES = [
+	"Super! Jeśli zazwyczaj nosisz {size}, to polecam wybrać ten sam rozmiar. Nasze produkty są zgodne ze standardem EU.",
+	"W przypadku tego produktu polecam sprawdzić tabelę rozmiarów na stronie - znajdziesz tam dokładne wymiary. Mogę pomóc z konkretnymi pytaniami!",
+];
+
+// Odpowiedzi gdy użytkownik rezygnuje z follow-up
+export const NO_THANKS_RESPONSES = [
+	"W porządku! Jeśli będziesz mieć jeszcze jakieś pytania, jestem tutaj. 😊",
+	"Rozumiem. W razie potrzeby chętnie pomogę!",
+	"Dobrze, daj znać gdybyś potrzebował pomocy z czymś innym.",
 ];

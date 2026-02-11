@@ -4,8 +4,12 @@
  */
 
 import { useEffect, useState } from "react";
-import type { Message } from "../lib/chatbot";
-import { processMessage, WELCOME_MESSAGE } from "../lib/chatbot";
+import type { ConversationContext, Message } from "../lib/chatbot";
+import {
+	createEmptyContext,
+	processMessage,
+	WELCOME_MESSAGE,
+} from "../lib/chatbot";
 
 /**
  * Generuje unikalny identyfikator dla wiadomości
@@ -43,6 +47,11 @@ export function useChat() {
 
 	// Stan wskazujący czy bot "pisze" odpowiedź
 	const [isTyping, setIsTyping] = useState(false);
+
+	// Kontekst konwersacji (zapamiętywanie stanu rozmowy)
+	const [context, setContext] = useState<ConversationContext>(
+		createEmptyContext()
+	);
 
 	// Inicjalizacja z wiadomością powitalną (tylko raz przy montowaniu)
 	useEffect(() => {
@@ -92,15 +101,18 @@ export function useChat() {
 		const typingDelay = 300 + Math.random() * 200; // 300-500ms
 
 		setTimeout(() => {
-			// Wygeneruj odpowiedź bota
-			const botResponseText = processMessage(trimmedText);
+			// Wygeneruj odpowiedź bota z uwzględnieniem kontekstu
+			const result = processMessage(trimmedText, context);
 
 			const botMessage: Message = {
 				id: generateId(),
-				text: botResponseText,
+				text: result.response,
 				sender: "bot",
 				timestamp: new Date(),
 			};
+
+			// Zaktualizuj kontekst konwersacji
+			setContext(result.updatedContext);
 
 			// Dodaj odpowiedź bota i wyłącz typing indicator
 			setMessages((prev) => [...prev, botMessage]);

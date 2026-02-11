@@ -4,7 +4,8 @@
  */
 
 import { DEFAULT_RESPONSE } from "./knowledge-base";
-import { findBestMatch } from "./matcher";
+import { findBestMatch, handleFollowUpResponse } from "./matcher";
+import type { ConversationContext } from "./types";
 
 /**
  * Wybiera losową odpowiedź z dostępnej tablicy
@@ -30,36 +31,84 @@ export function getRandomResponse(responses: string[]): string {
 }
 
 /**
- * Przetwarza wiadomość użytkownika i zwraca odpowiedź bota
+ * Wynik przetwarzania wiadomości
+ */
+export interface ProcessResult {
+	response: string; // Odpowiedź bota
+	updatedContext: ConversationContext; // Zaktualizowany kontekst
+}
+
+/**
+ * Przetwarza wiadomość użytkownika z uwzględnieniem kontekstu konwersacji
  *
  * Proces przetwarzania:
- * 1. Znormalizuj input użytkownika (wykonywane wewnątrz findBestMatch)
- * 2. Znajdź najlepsze dopasowanie wzorca z bazy wiedzy
- * 3. Jeśli brak dopasowania -> zwróć odpowiedź domyślną
- * 4. Jeśli znaleziono dopasowanie -> wybierz losową odpowiedź z dostępnych
+ * 1. Sprawdź czy bot oczekuje na odpowiedź follow-up
+ * 2. Jeśli tak, obsłuż odpowiedź i wyczyść kontekst
+ * 3. Jeśli nie, znajdź najlepsze dopasowanie wzorca
+ * 4. Jeśli wzorzec ma follow-up, ustaw oczekiwanie w kontekście
+ * 5. Zwróć odpowiedź i zaktualizowany kontekst
  *
  * @param userInput - Oryginalny tekst wiadomości użytkownika
- * @returns Odpowiedź bota
- *
- * @example
- * processMessage("Gdzie jest moje zamówienie?")
- * // "Status zamówienia możesz sprawdzić w zakładce 'Moje zamówienia' po zalogowaniu..."
- *
- * processMessage("xyz abc 123")
- * // "Przepraszam, nie do końca rozumiem..."
+ * @param context - Obecny kontekst konwersacji
+ * @returns Obiekt z odpowiedzią i zaktualizowanym kontekstem
  */
-export function processMessage(userInput: string): string {
+export function processMessage(
+	userInput: string,
+	context: ConversationContext
+): ProcessResult {
+	// Sprawdź czy bot oczekuje na odpowiedź follow-up
+	if (context.awaitingResponse) {
+		const followUpResponse = handleFollowUpResponse(userInput, context);
+
+		if (followUpResponse) {
+			// Wyczyść oczekiwanie na odpowiedź
+			const updatedContext: ConversationContext = {
+				...context,
+				awaitingResponse: undefined,
+				messageCount: context.messageCount + 1,
+			};
+
+			return {
+				response: followUpResponse,
+				updatedContext,
+			};
+		}
+	}
+
 	// Znajdź najlepsze dopasowanie wzorca
-	// (funkcja findBestMatch wewnętrznie normalizuje tekst)
 	const match = findBestMatch(userInput);
 
 	// Jeśli nie znaleziono dopasowania, zwróć odpowiedź domyślną
 	if (!match) {
-		return DEFAULT_RESPONSE;
+		return {
+			response: DEFAULT_RESPONSE,
+			updatedContext: {
+				...context,
+				messageCount: context.messageCount + 1,
+			},
+		};
 	}
 
 	// Wybierz losową odpowiedź z dostępnych w dopasowanym wzorcu
 	const response = getRandomResponse(match.pattern.responses);
 
-	return response;
+	// Zaktualizuj kontekst
+	let updatedContext: ConversationContext = {
+		...context,
+		lastCategory: match.pattern.category,
+		messageCount: context.messageCount + 1,
+	};
+
+	// Jeśli wzorzec ma follow-up, ustaw oczekiwanie
+	if (match.pattern.followUp) {
+		updatedContext = {
+			...updatedContext,
+			awaitingResponse: match.pattern.followUp.context,
+		};
+	}
+
+	return {
+		response,
+		updatedContext,
+	};
 }

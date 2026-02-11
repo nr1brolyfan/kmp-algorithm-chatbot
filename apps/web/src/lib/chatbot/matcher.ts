@@ -4,9 +4,20 @@
  */
 
 import { kmpSearch } from "./kmp";
-import { PATTERNS } from "./knowledge-base";
+import {
+	COMPLAINT_DETAILS_RESPONSES,
+	DELIVERY_METHOD_RESPONSES,
+	NO_THANKS_RESPONSES,
+	ORDER_NUMBER_RESPONSES,
+	PATTERNS,
+	SIZE_HELP_RESPONSES,
+} from "./knowledge-base";
 import { normalize } from "./normalizer";
-import type { MatchResult, Pattern } from "./types";
+import type { ConversationContext, MatchResult, Pattern } from "./types";
+
+// Regex dla rozpoznawania numerów i rozmiarów (zdefiniowane na poziomie modułu dla wydajności)
+const ORDER_NUMBER_REGEX = /\d{4,}/;
+const SIZE_REGEX = /\b(xs|s|m|l|xl|xxl|\d{2,})\b/i;
 
 /**
  * Oblicza score dopasowania na podstawie dopasowanych słów kluczowych i priorytetu wzorca
@@ -148,4 +159,95 @@ export function findBestMatch(text: string): MatchResult | null {
 
 	// Zwróć najlepsze dopasowanie (pierwszy element po sortowaniu)
 	return matches[0];
+}
+
+/**
+ * Obsługuje odpowiedź na pytanie follow-up
+ *
+ * @param text - Tekst użytkownika
+ * @param context - Kontekst konwersacji
+ * @returns Odpowiedź na follow-up lub null
+ */
+export function handleFollowUpResponse(
+	text: string,
+	context: ConversationContext
+): string | null {
+	if (!context.awaitingResponse) {
+		return null;
+	}
+
+	const normalizedText = normalize(text);
+
+	// Sprawdzenie czy użytkownik rezygnuje
+	const negativeKeywords = ["nie", "rezygnuje", "dzieki", "dziekuje"];
+	const hasNegative = negativeKeywords.some(
+		(keyword) => kmpSearch(normalizedText, keyword).length > 0
+	);
+
+	if (hasNegative) {
+		return NO_THANKS_RESPONSES[
+			Math.floor(Math.random() * NO_THANKS_RESPONSES.length)
+		];
+	}
+
+	// Obsługa kontekstów
+	switch (context.awaitingResponse) {
+		case "order-number": {
+			// Wyciągnij numer zamówienia (prosta detekcja ciągu cyfr)
+			const numberMatch = text.match(ORDER_NUMBER_REGEX);
+			if (numberMatch) {
+				const orderNumber = numberMatch[0];
+				return ORDER_NUMBER_RESPONSES[
+					Math.floor(Math.random() * ORDER_NUMBER_RESPONSES.length)
+				].replace("{number}", orderNumber);
+			}
+			return "Nie rozpoznałem numeru zamówienia. Proszę podaj 4-5 cyfrowy numer (np. 12345).";
+		}
+
+		case "cancel-order-number": {
+			const numberMatch = text.match(ORDER_NUMBER_REGEX);
+			if (numberMatch) {
+				const orderNumber = numberMatch[0];
+				return `Sprawdzam zamówienie ${orderNumber}... To zamówienie można jeszcze anulować. Proszę zadzwoń na infolinię 123-456-789 lub wypełnij formularz anulowania w panelu klienta.`;
+			}
+			return "Nie rozpoznałem numeru zamówienia. Podaj proszę numer zamówienia do anulowania.";
+		}
+
+		case "complaint-details": {
+			// Zaakceptuj dowolny opis problemu
+			return COMPLAINT_DETAILS_RESPONSES[
+				Math.floor(Math.random() * COMPLAINT_DETAILS_RESPONSES.length)
+			];
+		}
+
+		case "delivery-method-interest": {
+			// Sprawdź zainteresowanie metodą dostawy
+			if (kmpSearch(normalizedText, "kurier").length > 0) {
+				return DELIVERY_METHOD_RESPONSES.kurier[0];
+			}
+			if (
+				kmpSearch(normalizedText, "paczkomat").length > 0 ||
+				kmpSearch(normalizedText, "inpost").length > 0
+			) {
+				return DELIVERY_METHOD_RESPONSES.paczkomat[0];
+			}
+			if (kmpSearch(normalizedText, "darmowa").length > 0) {
+				return DELIVERY_METHOD_RESPONSES.darmowa[0];
+			}
+			return "Dostępne metody: kurier (15 zł), paczkomat (12 zł), darmowa dostawa od 200 zł. O którą chciałbyś wiedzieć więcej?";
+		}
+
+		case "size-help": {
+			// Rozpoznaj rozmiar
+			const sizeMatch = text.match(SIZE_REGEX);
+			if (sizeMatch) {
+				const size = sizeMatch[0].toUpperCase();
+				return SIZE_HELP_RESPONSES[0].replace("{size}", size);
+			}
+			return SIZE_HELP_RESPONSES[1];
+		}
+
+		default:
+			return null;
+	}
 }
