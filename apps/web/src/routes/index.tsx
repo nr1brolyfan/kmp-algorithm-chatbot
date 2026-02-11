@@ -1,34 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ChatContainer } from "@/components/chat/chat-container";
 
 export const Route = createFileRoute("/")({
-  component: HomeComponent,
+	component: HomeComponent,
 });
 
-const TITLE_TEXT = `
- ██████╗ ███████╗████████╗████████╗███████╗██████╗
- ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
- ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝
- ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗
- ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║
- ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
-
- ████████╗    ███████╗████████╗ █████╗  ██████╗██╗  ██╗
- ╚══██╔══╝    ██╔════╝╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝
-    ██║       ███████╗   ██║   ███████║██║     █████╔╝
-    ██║       ╚════██║   ██║   ██╔══██║██║     ██╔═██╗
-    ██║       ███████║   ██║   ██║  ██║╚██████╗██║  ██╗
-    ╚═╝       ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
- `;
-
 function HomeComponent() {
-  return (
-    <div className="container mx-auto max-w-3xl px-4 py-2">
-      <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
-      <div className="grid gap-6">
-        <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-medium">API Status</h2>
-        </section>
-      </div>
-    </div>
-  );
+	return (
+		<div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+			<div className="container mx-auto px-4">
+				{/* Nagłówek strony */}
+				<header className="mb-8 text-center">
+					<h1 className="mb-2 font-bold text-4xl text-gray-900">
+						Chatbot Obsługi Klienta
+					</h1>
+					<p className="text-gray-600 text-lg">
+						Sklep Internetowy - Asystent AI
+					</p>
+				</header>
+
+				{/* Główny kontener czatu - wycentrowany */}
+				<div className="flex justify-center">
+					<ChatContainer />
+				</div>
+			</div>
+		</div>
+	);
 }

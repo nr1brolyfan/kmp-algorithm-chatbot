@@ -49,4 +49,4 @@ coverage
 *.tgz
 .cache
 tmp
-temp
+tempapps/web/src/routeTree.gen.ts
